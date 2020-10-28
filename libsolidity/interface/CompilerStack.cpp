@@ -28,6 +28,7 @@
 
 #include <libsolidity/analysis/ControlFlowAnalyzer.h>
 #include <libsolidity/analysis/ControlFlowGraph.h>
+#include <libsolidity/analysis/ControlFlowRevertPruner.h>
 #include <libsolidity/analysis/ContractLevelChecker.h>
 #include <libsolidity/analysis/DeclarationTypeChecker.h>
 #include <libsolidity/analysis/DocStringAnalyser.h>
@@ -514,12 +515,14 @@ bool CompilerStack::analyze()
 				if (source->ast && !cfg.constructFlow(*source->ast))
 					noErrors = false;
 
+			ControlFlowRevertPruner pruner(cfg);
+			pruner.run();
+
 			if (noErrors)
 			{
 				ControlFlowAnalyzer controlFlowAnalyzer(cfg, m_errorReporter);
-				for (Source const* source: m_sourceOrder)
-					if (source->ast && !controlFlowAnalyzer.analyze(*source->ast))
-						noErrors = false;
+				if (!controlFlowAnalyzer.run())
+					noErrors = false;
 			}
 		}
 
