@@ -19,6 +19,8 @@
 
 #include <test/ExecutionFramework.h>
 
+#include <utility>
+
 namespace solidity::frontend::test
 {
 
@@ -310,5 +312,30 @@ struct FunctionCall
 
 using Builtin = std::function<std::optional<bytes>(FunctionCall const&)>;
 using SideEffectHook = std::function<std::vector<std::string>(FunctionCall const&)>;
+
+/// LogRecord
+struct LogRecord
+{
+	/// The address of the account which created the log.
+	util::h160 creator;
+	/// The data attached to the log.
+	bytes data;
+	/// The log topics.
+	std::vector<util::h256> topics;
+
+	LogRecord(util::h160 _creator, bytes _data, std::vector<util::h256> _topics)
+		: creator(_creator), data(std::move(_data)), topics(std::move(_topics)) {}
+
+	/// Equal operator.
+	bool operator==(LogRecord const& other) const noexcept
+	{
+		return creator == other.creator && data == other.data && topics == other.topics;
+	}
+
+	bool operator!=(LogRecord const& other) const noexcept
+	{
+		return !operator==(other);
+	}
+};
 
 }

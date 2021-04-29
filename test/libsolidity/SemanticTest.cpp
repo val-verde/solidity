@@ -178,9 +178,9 @@ map<string, Builtin> SemanticTest::makeBuiltins()
 	};
 }
 
-
 vector<SideEffectHook> SemanticTest::makeSideEffectHooks() const
 {
+	using namespace std::placeholders;
 	return {
 		[](FunctionCall const& _call) -> vector<string>
 		{
@@ -192,7 +192,78 @@ vector<SideEffectHook> SemanticTest::makeSideEffectHooks() const
 				return result;
 			}
 			return {};
-		}};
+		},
+		bind(&SemanticTest::eventSideEffectHook, this, _1)
+	};
+}
+
+vector<string> SemanticTest::eventSideEffectHook(FunctionCall const&) const
+{
+	static ABIType abiType(ABIType::Type::Hex);
+	vector<string> sideEffects;
+	vector<LogRecord> recordedLogs = ExecutionFramework::recordedLogs();
+	for (LogRecord const& log: recordedLogs)
+	{
+		optional<AnnotatedEventSignature> eventSignature;
+		if (!log.topics.empty())
+			eventSignature = matchEvent(log.topics[0]);
+		if (eventSignature.has_value())
+			soltestAssert(eventSignature.value().indexedTypes.size() == log.topics.size() - 1, "");
+
+		stringstream sideEffect;
+		sideEffect << "emit ";
+		if (eventSignature.has_value())
+			sideEffect << eventSignature.value().signature;
+		else
+			sideEffect << "<anonymous>";
+
+		if (m_contractAddress != log.creator)
+			sideEffect << " from 0x" << log.creator;
+
+		vector<string> eventStrings;
+		for (h256 const& topic: log.topics)
+			if (!eventSignature.has_value() || topic != log.topics.front())
+				eventStrings.push_back("#" + BytesUtils::formatBytes(topic.asBytes(), abiType));
+
+		soltestAssert(log.data.size() % 32 == 0, "");
+		for (size_t index = 0; index < log.data.size() / 32; ++index)
+		{
+			auto begin = log.data.begin() + static_cast<long>(index * 32);
+			bytes const& data = bytes{begin, begin + 32};
+			eventStrings.emplace_back(BytesUtils::formatBytes(data, abiType));
+		}
+
+		if (!eventStrings.empty())
+			sideEffect << ": ";
+		sideEffect << joinHumanReadable(eventStrings);
+		sideEffects.emplace_back(sideEffect.str());
+	}
+	return sideEffects;
+}
+
+optional<AnnotatedEventSignature> SemanticTest::matchEvent(util::h256 const& hash) const
+{
+	optional<AnnotatedEventSignature> result;
+	for (string& contractName: m_compiler.contractNames())
+	{
+		ContractDefinition const& contract = m_compiler.contractDefinition(contractName);
+		for (EventDefinition const* event: contract.events())
+		{
+			FunctionTypePointer eventFunctionType = event->functionType(true);
+			if (!event->isAnonymous() && keccak256(eventFunctionType->externalSignature()) == hash)
+			{
+				AnnotatedEventSignature eventInfo;
+				eventInfo.signature = eventFunctionType->externalSignature();
+				for (auto const& param: event->parameters())
+					if (param->isIndexed())
+						eventInfo.indexedTypes.emplace_back(param->type()->toString(true));
+					else
+						eventInfo.nonIndexedTypes.emplace_back(param->type()->toString(true));
+				result = eventInfo;
+			}
+		}
+	}
+	return result;
 }
 
 TestCase::TestResult SemanticTest::run(ostream& _stream, string const& _linePrefix, bool _formatted)
