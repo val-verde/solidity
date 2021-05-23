@@ -69,7 +69,7 @@ contract Test {
 // compileViaYul: also
 // ----
 // load() -> 0x01, 0x02, 0x03, 0x04, 0x05, 0x06
-// gas irOptimized: 111532
+// gas irOptimized: 111577
 // gas legacy: 113999
-// gas legacyOptimized: 106281
+// gas legacyOptimized: 106276
 // store() -> 0x01, 0x02, 0x03, 0x04, 0x05, 0x06

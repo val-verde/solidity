@@ -30,9 +30,9 @@ contract c {
 // x() -> 0, 0
 // y() -> 0, 0
 // set() ->
-// gas irOptimized: 101354
+// gas irOptimized: 101351
 // gas legacy: 101332
-// gas legacyOptimized: 101282
+// gas legacyOptimized: 101277
 // x() -> 1, 2
 // y() -> 3, 4
 // swap() ->

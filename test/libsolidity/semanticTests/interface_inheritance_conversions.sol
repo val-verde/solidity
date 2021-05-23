@@ -37,10 +37,11 @@ contract C {
 // compileViaYul: also
 // ----
 // convertParent() -> 1
-// gas irOptimized: 103637
+// gas irOptimized: 116878
+// gas legacy: 111604
 // convertSubA() -> 1, 2
-// gas irOptimized: 105720
-// gas legacy: 101703
+// gas irOptimized: 118958
+// gas legacy: 113913
 // convertSubB() -> 1, 3
-// gas irOptimized: 105654
-// gas legacy: 101637
+// gas irOptimized: 118892
+// gas legacy: 113847
