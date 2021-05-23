@@ -598,7 +598,8 @@ function calls which will cause a Panic.
 A Panic exception is generated in the following situations.
 The error code supplied with the error data indicates the kind of panic.
 
-#. 0x01: If you call ``assert`` with an argument that evaluates to false.
+#. 0x00: Used for generic compiler inserted panics.
+#. 0x01: If you call ``assert`` with an argument that evaluates to false. Also used for generic compiler inserted assertions.
 #. 0x11: If an arithmetic operation results in underflow or overflow outside of an ``unchecked { ... }`` block.
 #. 0x12; If you divide or modulo by zero (e.g. ``5 / 0`` or ``23 % 0``).
 #. 0x21: If you convert a value that is too big or negative into an enum type.
