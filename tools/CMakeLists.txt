@@ -9,7 +9,7 @@ add_executable(solidity-upgrade
     solidityUpgrade/SourceTransform.h
     solidityUpgrade/SourceUpgrade.cpp
 )
-target_link_libraries(solidity-upgrade PRIVATE solidity Boost::boost Boost::program_options Boost::system)
+target_link_libraries(solidity-upgrade PRIVATE solidity Boost::boost Boost::program_options)
 
 include(GNUInstallDirs)
 install(TARGETS solidity-upgrade DESTINATION "${CMAKE_INSTALL_BINDIR}")
