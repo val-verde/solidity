@@ -58,6 +58,8 @@ ExternalProject_Add(jsoncpp-project
                -DCMAKE_CXX_FLAGS=${JSONCPP_CXX_FLAGS}
                -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                -DCMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}
+               -DCMAKE_AR=${CMAKE_AR}
+               -DCMAKE_RANLIB=${CMAKE_RANLIB}
                ${JSONCPP_CMAKE_ARGS}
     ${byproducts}
 )
