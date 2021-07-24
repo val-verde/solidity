@@ -98,7 +98,7 @@ public:
 	{
 		m_stdin = GetStdHandle(STD_INPUT_HANDLE);
 		GetConsoleMode(m_stdin, &m_oldMode);
-		SetConsoleMode(m_stdin, m_oldMode & (~(ENABLE_ECHO_INPUT | ENABLE_LINE_INPUT)));
+		SetConsoleMode(m_stdin, m_oldMode & (DWORD)(~(ENABLE_ECHO_INPUT | ENABLE_LINE_INPUT)));
 	}
 	~DisableConsoleBuffering()
 	{
