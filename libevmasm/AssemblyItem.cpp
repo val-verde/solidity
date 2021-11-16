@@ -147,7 +147,7 @@ size_t AssemblyItem::bytesRequired(size_t _addressLength, Precision _precision) 
 		else
 		{
 			solAssert(m_immutableOccurrences, "No immutable references. `bytesRequired()` called before assembly()?");
-			immutableOccurrences = m_immutableOccurrences.value();
+			immutableOccurrences = static_cast<unsigned long>(m_immutableOccurrences.value());
 		}
 
 		if (immutableOccurrences != 0)
